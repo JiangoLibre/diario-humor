@@ -1,7 +1,7 @@
 export default function Privacidade() {
   return (
-    <main className="mx-auto max-w-xl p-6 space-y-3 text-sm">
-      <a href="/cadastro" className="underline">← Voltar</a>
+    <main className="mx-auto max-w-xl space-y-3 p-6 text-sm leading-relaxed">
+      <a href="/cadastro" className="link">← Voltar</a>
       <h1 className="text-xl font-bold">Política de Privacidade</h1>
       <p><b>Projeto em fase de teste.</b> Este app é um protótipo.</p>
 

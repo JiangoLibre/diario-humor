@@ -38,22 +38,28 @@ export default function Psicologo() {
     router.push('/login')
   }
 
-  return (
-    <main className="mx-auto max-w-sm p-6 space-y-3">
-      <h1 className="text-xl font-bold">Olá, {nome} (psicólogo)</h1>
-      <button onClick={convidar} className="w-full bg-black text-white p-2 rounded">Gerar convite</button>
-      <ul className="space-y-2">
+    return (
+    <main className="mx-auto max-w-md space-y-4 p-6">
+      <header className="flex items-center justify-between">
+        <h1 className="text-xl font-bold">Olá, {nome} 👋</h1>
+        <button onClick={sair} className="link">Sair</button>
+      </header>
+
+      <button onClick={convidar} className="btn">+ Gerar convite</button>
+
+      <div className="space-y-2">
+        <h2 className="font-semibold">Pacientes</h2>
+        {vinculos.length === 0 && <p className="text-sm text-muted">Nenhum convite ainda.</p>}
         {vinculos.map(v => (
-          <li key={v.id} className="border p-2 rounded text-sm">
+          <div key={v.id} className="card text-sm">
             {v.status === 'pendente'
-              ? <>Código: <b>{v.codigo}</b> (aguardando)</>
+              ? <>Código: <b className="tracking-widest">{v.codigo}</b> <span className="text-muted">(aguardando)</span></>
               : v.status === 'ativo'
-                ? <a href={`/psicologo/paciente/${v.paciente_id}`} className="underline">{v.paciente?.nome ?? 'Paciente'} →</a>
-                : <>{v.paciente?.nome ?? 'Paciente'} ({v.status})</>}
-          </li>
+                ? <a href={`/psicologo/paciente/${v.paciente_id}`} className="font-medium text-brand-dark">{v.paciente?.nome ?? 'Paciente'} →</a>
+                : <span className="text-muted">{v.paciente?.nome ?? 'Paciente'} ({v.status})</span>}
+          </div>
         ))}
-      </ul>
-      <button onClick={sair} className="underline text-sm">Sair</button>
+      </div>
     </main>
   )
 }

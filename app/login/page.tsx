@@ -21,14 +21,20 @@ export default function Login() {
     router.push(perfil?.tipo === 'psicologo' ? '/psicologo' : '/paciente')
   }
 
-  return (
-    <main className="mx-auto max-w-sm p-6 space-y-3">
-      <h1 className="text-xl font-bold">Entrar</h1>
-      <input className="w-full border p-2 rounded" placeholder="E-mail" type="email" value={email} onChange={e => setEmail(e.target.value)} />
-      <input className="w-full border p-2 rounded" placeholder="Senha" type="password" value={senha} onChange={e => setSenha(e.target.value)} />
-      <button onClick={entrar} className="w-full bg-black text-white p-2 rounded">Entrar</button>
-      {erro && <p className="text-red-600 text-sm">{erro}</p>}
-      <a href="/cadastro" className="block text-sm underline">Criar conta</a>
+    return (
+    <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-4 p-6">
+      <div className="space-y-1 text-center">
+        <div className="text-4xl">🙂</div>
+        <h1 className="text-2xl font-bold">Bem-vindo(a)</h1>
+        <p className="text-sm text-muted">Entre para registrar seu dia</p>
+      </div>
+      <div className="card space-y-3">
+        <input className="input" placeholder="E-mail" type="email" value={email} onChange={e => setEmail(e.target.value)} />
+        <input className="input" placeholder="Senha" type="password" value={senha} onChange={e => setSenha(e.target.value)} />
+        <button onClick={entrar} className="btn">Entrar</button>
+        {erro && <p className="text-sm text-red-600">{erro}</p>}
+      </div>
+      <a href="/cadastro" className="link text-center">Criar conta</a>
     </main>
   )
 }

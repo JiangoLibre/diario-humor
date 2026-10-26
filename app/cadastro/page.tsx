@@ -25,21 +25,28 @@ export default function Cadastro() {
     router.push(tipo === 'psicologo' ? '/psicologo' : '/paciente')
   }
 
-  return (
-    <main className="mx-auto max-w-sm p-6 space-y-3">
-      <h1 className="text-xl font-bold">Criar conta</h1>
-      <input className="w-full border p-2 rounded" placeholder="Nome" value={nome} onChange={e => setNome(e.target.value)} />
-      <input className="w-full border p-2 rounded" placeholder="E-mail" type="email" value={email} onChange={e => setEmail(e.target.value)} />
-      <input className="w-full border p-2 rounded" placeholder="Senha (mín. 6)" type="password" value={senha} onChange={e => setSenha(e.target.value)} />
-      <select className="w-full border p-2 rounded" value={tipo} onChange={e => setTipo(e.target.value)}>
-        <option value="paciente">Sou paciente</option>
-        <option value="psicologo">Sou psicólogo(a)</option>
-      </select>
-      <p className="text-xs">
-       Ao cadastrar, você concorda com a <a href="/privacidade" className="underline">Política de Privacidade</a>.
-      </p>
-      <button onClick={cadastrar} className="w-full bg-black text-white p-2 rounded">Cadastrar</button>
-      {erro && <p className="text-red-600 text-sm">{erro}</p>}
+return (
+    <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-4 p-6">
+      <div className="space-y-1 text-center">
+        <div className="text-4xl">🙂</div>
+        <h1 className="text-2xl font-bold">Criar conta</h1>
+        <p className="text-sm text-muted">Leva menos de um minuto</p>
+      </div>
+      <div className="card space-y-3">
+        <input className="input" placeholder="Nome" value={nome} onChange={e => setNome(e.target.value)} />
+        <input className="input" placeholder="E-mail" type="email" value={email} onChange={e => setEmail(e.target.value)} />
+        <input className="input" placeholder="Senha (mín. 6)" type="password" value={senha} onChange={e => setSenha(e.target.value)} />
+        <select className="input" value={tipo} onChange={e => setTipo(e.target.value)}>
+          <option value="paciente">Sou paciente</option>
+          <option value="psicologo">Sou psicólogo(a)</option>
+        </select>
+        <p className="text-xs text-muted">
+          Ao cadastrar, você concorda com a <a href="/privacidade" className="link">Política de Privacidade</a>.
+        </p>
+        <button onClick={cadastrar} className="btn">Cadastrar</button>
+        {erro && <p className="text-sm text-red-600">{erro}</p>}
+      </div>
+      <a href="/login" className="link text-center">Já tenho conta</a>
     </main>
   )
 }

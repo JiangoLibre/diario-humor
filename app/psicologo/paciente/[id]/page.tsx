@@ -36,38 +36,41 @@ function Conteudo() {
     ? (regs.reduce((s, r) => s + r.humor, 0) / regs.length).toFixed(1)
     : '-'
 
-  return (
-    <main className="mx-auto max-w-2xl p-6 space-y-4">
-      <a href="/psicologo" className="underline text-sm">← Voltar</a>
+    return (
+    <main className="mx-auto max-w-2xl space-y-4 p-6">
+      <a href="/psicologo" className="link">← Voltar</a>
       <h1 className="text-xl font-bold">{nome}</h1>
 
-      <div className="flex gap-2 text-sm">
+      <div className="flex gap-2">
         {[7, 30].map(d => (
           <button key={d} onClick={() => setDias(d)}
-            className={`px-3 py-1 rounded border ${dias === d ? 'bg-black text-white' : ''}`}>
+            className={`rounded-full px-4 py-1.5 text-sm font-medium ${dias === d ? 'bg-brand text-white' : 'bg-white text-muted border border-gray-200'}`}>
             {d} dias
           </button>
         ))}
       </div>
 
-      <p className="text-sm">Registros: {regs.length} | Humor médio: {media}</p>
+      <div className="grid grid-cols-2 gap-3">
+        <div className="card"><p className="text-xs text-muted">Registros</p><p className="text-2xl font-bold">{regs.length}</p></div>
+        <div className="card"><p className="text-xs text-muted">Humor médio</p><p className="text-2xl font-bold">{media}</p></div>
+      </div>
 
-      <div className="h-56">
+      <div className="card h-64">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={regs}>
-            <XAxis dataKey="data" tickFormatter={(d: string) => d.slice(5)} />
-            <YAxis domain={[1, 5]} ticks={[1, 2, 3, 4, 5]} />
+            <XAxis dataKey="data" tickFormatter={(d: string) => d.slice(5)} stroke="#9CA3AF" fontSize={12} />
+            <YAxis domain={[1, 5]} ticks={[1, 2, 3, 4, 5]} stroke="#9CA3AF" fontSize={12} />
             <Tooltip />
-            <Line type="monotone" dataKey="humor" stroke="#000" strokeWidth={2} />
+            <Line type="monotone" dataKey="humor" stroke="#2BB5A3" strokeWidth={3} dot={{ r: 4 }} />
           </LineChart>
         </ResponsiveContainer>
       </div>
 
       <ul className="space-y-2">
         {[...regs].reverse().map(r => (
-          <li key={r.id} className="border rounded p-2 text-sm">
-            <b>{r.data.slice(8)}/{r.data.slice(5, 7)}</b> {rostos[r.humor - 1]}
-            {r.texto && <p className="mt-1">{r.texto}</p>}
+          <li key={r.id} className="card text-sm">
+            <b>{r.data.slice(8)}/{r.data.slice(5, 7)}</b> <span className="text-lg">{rostos[r.humor - 1]}</span>
+            {r.texto && <p className="mt-1 text-muted">{r.texto}</p>}
           </li>
         ))}
       </ul>
