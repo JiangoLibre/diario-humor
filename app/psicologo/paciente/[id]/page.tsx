@@ -1,14 +1,15 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 
+
 type Reg = { id: string; data: string; humor: number; texto: string | null }
 const rostos = ['😢', '🙁', '😐', '🙂', '😄']
 
-export default function PacientePsi() {
+function Conteudo() {
   const { id } = useParams<{ id: string }>()
   const router = useRouter()
   const [nome, setNome] = useState('')
@@ -71,5 +72,12 @@ export default function PacientePsi() {
         ))}
       </ul>
     </main>
+  )
+}
+export default function PacientePsi() {
+  return (
+    <Suspense fallback={<p className="p-6">Carregando...</p>}>
+      <Conteudo />
+    </Suspense>
   )
 }
