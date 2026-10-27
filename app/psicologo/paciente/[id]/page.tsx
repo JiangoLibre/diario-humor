@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
+import ResumoSessao from '@/components/ResumoSessao'
 
 type Reg = { id: string; data: string; humor: number; texto: string | null; ansiedade: number | null; sono_horas: number | null }
 type Nota = { id: string; texto: string; criada_em: string }
@@ -34,9 +35,28 @@ function Conteudo() {
   const [quests, setQuests] = useState<Quest[]>([])
   const [novaNota, setNovaNota] = useState('')
   const [abertos, setAbertos] = useState<string[]>([])
+  const [marcados, setMarcados] = useState<string[]>([])
+  const [soMarcados, setSoMarcados] = useState(false)
 
   function alternarRegistro(rid: string) {
     setAbertos(a => (a.includes(rid) ? a.filter(x => x !== rid) : [...a, rid]))
+  }
+
+  async function carregarMarcados(ids: string[]) {
+    if (ids.length === 0) return setMarcados([])
+    const { data } = await supabase.from('destaques').select('registro_id').in('registro_id', ids)
+    setMarcados((data ?? []).map(d => d.registro_id as string))
+  }
+
+  async function alternarMarca(rid: string) {
+    if (marcados.includes(rid)) {
+      setMarcados(m => m.filter(x => x !== rid))
+      await supabase.from('destaques').delete().eq('registro_id', rid)
+    } else {
+      setMarcados(m => [...m, rid])
+      const { data } = await supabase.auth.getUser()
+      await supabase.from('destaques').insert({ psicologo_id: data.user!.id, registro_id: rid })
+    }
   }
 
   async function carregarNotas() {
@@ -78,7 +98,9 @@ function Conteudo() {
         .eq('paciente_id', id)
         .gte('data', desde.toISOString().slice(0, 10))
         .order('data')
-      setRegs((r ?? []) as Reg[])
+      const lista = (r ?? []) as Reg[]
+      setRegs(lista)
+      carregarMarcados(lista.map(x => x.id))
       carregarNotas()
       carregarQuest()
     })
@@ -91,7 +113,8 @@ function Conteudo() {
   }
 
   const lista = [...regs].reverse()
-  const visiveis = verTodos ? lista : lista.slice(0, 10)
+  const base = soMarcados ? lista.filter(r => marcados.includes(r.id)) : lista
+  const visiveis = verTodos ? base : base.slice(0, 10)
   const temExtras = regs.some(r => r.ansiedade !== null || r.sono_horas !== null)
   const alertaItem9 = quests.find(q => (q.item9 ?? 0) > 0)
 
@@ -109,7 +132,7 @@ function Conteudo() {
           (pensamentos de se ferir ou de que seria melhor estar morto/a) foi marcado como: <b>{freq[alertaItem9.item9 ?? 0]}</b>.
         </div>
       )}
-
+      <ResumoSessao pacienteId={id} />
       <div className="flex flex-wrap gap-2">
         {[7, 30, 90, 365].map(d => (
           <button key={d} onClick={() => setDias(d)} className={chip(dias === d)}>
@@ -160,40 +183,60 @@ function Conteudo() {
 
       {aba === 'registros' && (
         <>
-          <div className="flex gap-4">
+          <div className="flex flex-wrap items-center gap-4">
             <button onClick={() => setAbertos(visiveis.filter(r => r.texto).map(r => r.id))} className="link">Expandir tudo</button>
             <button onClick={() => setAbertos([])} className="link">Recolher tudo</button>
+            <button onClick={() => { setSoMarcados(!soMarcados); setVerTodos(false) }} className={chip(soMarcados)}>
+              ⭐ Marcados ({marcados.length})
+            </button>
           </div>
+
+          {base.length === 0 && (
+            <p className="text-sm text-muted">
+              {soMarcados ? 'Nenhum dia marcado neste período. Toque na estrela de um registro para marcar.' : 'Nenhum registro neste período.'}
+            </p>
+          )}
 
           <ul className="space-y-2">
             {visiveis.map(r => {
               const aberto = abertos.includes(r.id)
+              const marcado = marcados.includes(r.id)
               const extras = [
                 r.ansiedade !== null ? `ansiedade ${r.ansiedade}/10` : '',
                 r.sono_horas !== null ? `sono ${r.sono_horas}h` : '',
               ].filter(Boolean).join(' · ')
               return (
                 <li key={r.id} className="card text-sm" style={{ padding: 0 }}>
-                  <button
-                    onClick={() => alternarRegistro(r.id)}
-                    className="flex w-full items-center justify-between px-4 py-3 text-left"
-                  >
-                    <span>
-                      <b>{r.data.slice(8)}/{r.data.slice(5, 7)}/{r.data.slice(0, 4)}</b>{' '}
-                      <span className="text-lg">{rostos[r.humor - 1]}</span>
-                      {extras && <span className="ml-2 text-xs text-muted">{extras}</span>}
-                    </span>
-                    <span className="text-muted">{r.texto ? (aberto ? '▲' : '▼') : ''}</span>
-                  </button>
+                  <div className="flex items-center">
+                    <button
+                      onClick={() => alternarRegistro(r.id)}
+                      className="flex flex-1 items-center justify-between px-4 py-3 text-left"
+                    >
+                      <span>
+                        <b>{r.data.slice(8)}/{r.data.slice(5, 7)}/{r.data.slice(0, 4)}</b>{' '}
+                        <span className="text-lg">{rostos[r.humor - 1]}</span>
+                        {extras && <span className="ml-2 text-xs text-muted">{extras}</span>}
+                      </span>
+                      <span className="text-muted">{r.texto ? (aberto ? '▲' : '▼') : ''}</span>
+                    </button>
+                    <button
+                      onClick={() => alternarMarca(r.id)}
+                      title="Levar para a sessão"
+                      aria-label="Marcar para levar à sessão"
+                      className="px-3 py-3 text-lg"
+                    >
+                      {marcado ? '⭐' : '☆'}
+                    </button>
+                  </div>
                   {aberto && r.texto && <p className="px-4 pb-3 text-muted">{r.texto}</p>}
                 </li>
               )
             })}
           </ul>
 
-          {lista.length > 10 && (
+          {base.length > 10 && (
             <button onClick={() => setVerTodos(!verTodos)} className="link">
-              {verTodos ? 'Ver menos' : `Ver todos (${lista.length})`}
+              {verTodos ? 'Ver menos' : `Ver todos (${base.length})`}
             </button>
           )}
         </>

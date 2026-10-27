@@ -133,7 +133,7 @@ export default function Psicologo() {
       </div>
 
       <p className="text-xs text-muted">
-        Indicadores de apoio, não monitoramento em tempo real. Registros marcados como privados não aparecem aqui.
+        Indicadores de apoio, não monitoramento em tempo real nem serviço de emergência. Os alertas só aparecem quando você abre o painel. Registros marcados como privados não aparecem aqui.
       </p>
     </main>
   )
