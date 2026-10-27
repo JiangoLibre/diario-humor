@@ -4,6 +4,8 @@ import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import RegistroDia from '@/components/RegistroDia'
+import Questionarios from '@/components/Questionarios'
+import Progresso from '@/components/Progresso'
 
 type Vinculo = { id: string; status: string }
 
@@ -62,8 +64,10 @@ export default function Paciente() {
         <h1 className="text-xl font-bold">Olá, {nome} 👋</h1>
         <button onClick={sair} className="link">Sair</button>
       </header>
-
+      
+      <Progresso />
       <RegistroDia />
+      <Questionarios />
 
       <div className="card space-y-3">
         <h2 className="font-semibold">Acompanhamento</h2>
